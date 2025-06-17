@@ -3,4 +3,4 @@ Advanced toolkit for detecting and exploiting Host Header Injection vulnerabilit
 - **Nuclei templates** for comprehensive detection
 - **HHEx.py** tool (coming soon) for advanced exploitation
 - Bypass techniques and WAF evasion
-- 
+
