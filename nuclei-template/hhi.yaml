@@ -1,0 +1,80 @@
+id: reflected-host-header-injection-ultimate-spectorsec
+
+info:
+  name: Reflected Host Header Injection - Ultimate Detection
+  author: Spector-Sec
+  severity: medium
+  description: |
+    Advanced reflected Host Header Injection detection with real-time reflection location, bypass tricks, and alternate header vectors.
+  tags: host-header,injection,web,bypass,waf,hhi
+
+requests:
+  - method: GET
+    path:
+      - "{{BaseURL}}"
+      - "{{BaseURL}}/%2e/"
+      - "{{BaseURL}}:443"
+      - "{{BaseURL}}/redirect"
+
+    headers:
+      Host: "{{randstr}}.spector-sec.com"
+      X-Forwarded-Host: "{{randstr}}.spector-sec.com"
+      X-Host: "{{randstr}}.spector-sec.com"
+      Forwarded: "host={{randstr}}.spector-sec.com"
+      X-Original-URL: "/"
+      X-Forwarded-Server: "{{randstr}}.spector-sec.com"
+      X-Forwarded-Scheme: "http"
+      Referer: "http://{{randstr}}.spector-sec.com"
+      X-Forwarded-For: "127.0.0.1"
+      X-Client-IP: "127.0.0.1"
+      True-Client-IP: "127.0.0.1"
+
+    matchers-condition: or
+    matchers:
+      - name: reflected-in-html
+        type: word
+        part: body
+        words:
+          - "{{randstr}}.spector-sec.com"
+
+      - name: reflected-in-location-header
+        type: regex
+        part: header
+        regex:
+          - "Location:.*{{randstr}}\\.spector-sec\\.com"
+
+      - name: reflected-in-json-js
+        type: regex
+        part: body
+        regex:
+          - "\"host\"\\s*:\\s*\"{{randstr}}\\.spector-sec\\.com\""
+          - "var\\s+.*?\\s*=\\s*\"{{randstr}}\\.spector-sec\\.com\""
+
+      - name: reflected-in-meta-tags
+        type: regex
+        part: body
+        regex:
+          - "<meta[^>]+content=[\"']http[s]?://{{randstr}}\\.spector-sec\\.com"
+          - "<link[^>]+href=[\"']http[s]?://{{randstr}}\\.spector-sec\\.com"
+
+      - name: reflected-in-csp-cors
+        type: word
+        part: header
+        words:
+          - "Access-Control-Allow-Origin: http://{{randstr}}.spector-sec.com"
+          - "Content-Security-Policy: default-src http://{{randstr}}.spector-sec.com"
+
+      - name: reflected-in-error-debug
+        type: regex
+        part: body
+        regex:
+          - "Exception.*{{randstr}}\\.spector-sec\\.com"
+          - "Error.*{{randstr}}\\.spector-sec\\.com"
+
+    extractors:
+      - type: regex
+        part: body
+        name: reflected-snippet
+        group: 0
+        regex:
+          - ".*{{randstr}}\\.spector-sec\\.com.*"
