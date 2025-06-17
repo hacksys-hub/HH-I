@@ -19,4 +19,4 @@
 
 **Usage**:
 ```bash
-nuclei -t nuclei_templates/reflected-host-header-injection-ultimate-spectorsec.yaml -u https://target.com
+nuclei -t hhi.yaml -u https://target.com
