@@ -20,3 +20,5 @@
 **Usage**:
 ```bash
 nuclei -t hhi.yaml -u https://target.com
+cat urls.txt | nuclei -t hhi.yaml
+cat subdomains.txt | katana | gf (ssrf,openredirect,...etc) |  nuclei -t hhi.yaml -c 100 -retries 2 
